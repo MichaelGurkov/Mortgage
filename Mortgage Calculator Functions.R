@@ -224,7 +224,7 @@ RealShpitzerTable = function(Table,CPI.index){
 #*******************************************************************************
 
 MortgageLoanTable = function(Principal, AnnualHorizon, Schedule = "Shpitzer"
-                        ,LoanType = NULL,NominalInterest = NULL
+                        ,LoanType = "FixedRate",NominalInterest = NULL
                         ,RealInterest = NULL, InterestVector = NULL
                         ,IndexVector = NULL){
   
