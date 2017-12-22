@@ -235,23 +235,24 @@ MortgageLoanTable = function(Principal, AnnualHorizon, Schedule = "Shpitzer"
     if(LoanType == "FixedRate"){
     
     MortgageLoan = ShpitzerTable(Principal = Principal
-                                 ,Interest = NominalInterest
-                                 ,Horizon = AnnualHorizon)
+                                 ,Interest = (1 + NominalInterest) ^ (1/12) - 1
+                                 ,Horizon = AnnualHorizon * 12)
     }
     
     if(LoanType %in% c("Prime","VarRate")){
       
       MortgageLoan = VarShpitzerTable(Principal = Principal
-                                   ,Interest = InterestVector
-                                   ,Horizon = AnnualHorizon)
+                                   ,Interest = (1 + InterestVector) ^ (1/12) - 1
+                                   ,Horizon = AnnualHorizon * 12)
     }
     
     if(LoanType == "RealFixedRate"){
       
-      MortgageLoan = RealShpitzerTable(ShpitzerTable(Principal = Principal
-                                                     ,Interest = RealInterest
-                                                     ,Horizon = AnnualHorizon)
-                                       ,IndexVector)
+      MortgageLoan = 
+        RealShpitzerTable(ShpitzerTable(Principal = Principal
+                                       ,Interest = (1 + RealInterest) ^ (1/12) - 1
+                                       ,Horizon = AnnualHorizon * 12),
+                         CPI.index = IndexVector)
     }
     
     
