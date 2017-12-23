@@ -20,7 +20,11 @@
 
 # 1. ShpitzerTable = function (Principal,Interest,Horizon)
 
+# 2. EqualPrincipalTable = function (Principal,Interest,Horizon)
+
 # 2. VarShpitzerTable = function (Principal,Interest,Horizon)
+
+# 2. VarEqualPrincipalTable = function (Principal,Interest,Horizon)
 
 # 3. index.table = function(Table,index.vec)
 
@@ -112,6 +116,34 @@ ShpitzerTable = function (Principal,Interest,Horizon){
       ShpitzerTable$StartBalance - ShpitzerTable$PrincipalPmt
     
 return(ShpitzerTable)
+  
+}
+
+EqualPrincipalTable = function (Principal,Interest,Horizon){
+  
+  EqualPrincipalTable = data.frame(Period = numeric(Horizon),
+                             StartBalance = numeric(Horizon),
+                             PrincipalPmt = numeric(Horizon),
+                             InterestPmt = numeric(Horizon),
+                             TotalPmt = numeric(Horizon),
+                             EndBalance = numeric(Horizon))
+  
+  EqualPrincipalTable$Period = seq(1,Horizon)
+  
+  EqualPrincipalTable$PrincipalPmt = Principal / Horizon
+  
+  EqualPrincipalTable$StartBalance =
+    Principal - EqualPrincipalTable$PrincipalPmt * (EqualPrincipalTable$Period - 1)
+  
+  EqualPrincipalTable$InterestPmt = Interest * EqualPrincipalTable$StartBalance
+  
+  EqualPrincipalTable$TotalPmt = 
+    EqualPrincipalTable$PrincipalPmt + EqualPrincipalTable$InterestPmt
+  
+  EqualPrincipalTable$EndBalance = 
+    EqualPrincipalTable$StartBalance - EqualPrincipalTable$PrincipalPmt
+  
+  return(EqualPrincipalTable)
   
 }
 
@@ -212,6 +244,40 @@ VarShpitzerTable = function (Principal,Interest,Horizon){
   
 }
 
+VarEqualPrincipalTable = function (Principal,Interest,Horizon){
+  
+  if (!length(Interest) == Horizon) {
+    
+    stop("Interest vector in not the same length as Horizon")
+    
+  }
+  
+  EqualPrincipalTable = data.frame(Period = numeric(Horizon),
+                                   StartBalance = numeric(Horizon),
+                                   PrincipalPmt = numeric(Horizon),
+                                   InterestPmt = numeric(Horizon),
+                                   TotalPmt = numeric(Horizon),
+                                   EndBalance = numeric(Horizon))
+  
+  EqualPrincipalTable$Period = seq(1,Horizon)
+  
+  EqualPrincipalTable$PrincipalPmt = Principal / Horizon
+  
+  EqualPrincipalTable$StartBalance =
+    Principal - EqualPrincipalTable$PrincipalPmt * (EqualPrincipalTable$Period - 1)
+  
+  EqualPrincipalTable$InterestPmt = Interest * EqualPrincipalTable$StartBalance
+  
+  EqualPrincipalTable$TotalPmt = 
+    EqualPrincipalTable$PrincipalPmt + EqualPrincipalTable$InterestPmt
+  
+  EqualPrincipalTable$EndBalance = 
+    EqualPrincipalTable$StartBalance - EqualPrincipalTable$PrincipalPmt
+  
+  return(EqualPrincipalTable)
+  
+}
+
 #*******************************************************************************
 
 RealShpitzerTable = function(Table,CPI.index){
@@ -249,15 +315,45 @@ MortgageLoanTable = function(Principal, AnnualHorizon, Schedule = "Shpitzer"
     if(LoanType == "RealFixedRate"){
       
       MortgageLoan = 
-        RealShpitzerTable(ShpitzerTable(Principal = Principal
+        index.table(Table = ShpitzerTable(Principal = Principal
                                        ,Interest = (1 + RealInterest) ^ (1/12) - 1
                                        ,Horizon = AnnualHorizon * 12),
-                         CPI.index = IndexVector)
+                         index.vec = IndexVector)
     }
     
     
   }
 
+  
+# EqualPrincipal Schedule
+#------------------------------------------------------------------------------  
+if(Schedule == "EqualPrincipal"){
+  
+  if(LoanType == "FixedRate"){
+    
+    MortgageLoan = ShpitzerTable(Principal = Principal
+                                 ,Interest = (1 + NominalInterest) ^ (1/12) - 1
+                                 ,Horizon = AnnualHorizon * 12)
+  }
+  
+  if(LoanType %in% c("Prime","VarRate")){
+    
+    MortgageLoan = VarShpitzerTable(Principal = Principal
+                                    ,Interest = (1 + InterestVector) ^ (1/12) - 1
+                                    ,Horizon = AnnualHorizon * 12)
+  }
+  
+  if(LoanType == "RealFixedRate"){
+    
+    MortgageLoan = 
+      RealShpitzerTable(ShpitzerTable(Principal = Principal
+                                      ,Interest = (1 + RealInterest) ^ (1/12) - 1
+                                      ,Horizon = AnnualHorizon * 12),
+                        CPI.index = IndexVector)
+  }
+  
+  
+}  
 #------------------------------------------------------------------------------
   
 return(MortgageLoan)
