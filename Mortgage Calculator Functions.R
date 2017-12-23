@@ -28,7 +28,7 @@
 
 # 3. index.table = function(Table,index.vec)
 
-# 4. RealShpitzerTable = function(Table,CPI.index)
+# 4. 
 #  
 # 5. MortgageLoanTable = function(Principal, AnnualHorizon, Schedule = "Shpitzer"
 #                            ,LoanType = NULL,NominalInterest = NULL
@@ -280,15 +280,6 @@ VarEqualPrincipalTable = function (Principal,Interest,Horizon){
 
 #*******************************************************************************
 
-RealShpitzerTable = function(Table,CPI.index){
-  
-  resTable = index.table(Table = Table, index.vec = CPI.index)
-  
-  return(resTable)
-}
-
-#*******************************************************************************
-
 MortgageLoanTable = function(Principal, AnnualHorizon, Schedule = "Shpitzer"
                         ,LoanType = "FixedRate",NominalInterest = NULL
                         ,RealInterest = NULL, InterestVector = NULL
@@ -346,10 +337,10 @@ if(Schedule == "EqualPrincipal"){
   if(LoanType == "RealFixedRate"){
     
     MortgageLoan = 
-      RealShpitzerTable(ShpitzerTable(Principal = Principal
+      index.table(Table = ShpitzerTable(Principal = Principal
                                       ,Interest = (1 + RealInterest) ^ (1/12) - 1
                                       ,Horizon = AnnualHorizon * 12),
-                        CPI.index = IndexVector)
+                  index.vec = IndexVector)
   }
   
   
