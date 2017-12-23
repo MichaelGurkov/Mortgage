@@ -322,14 +322,14 @@ if(Schedule == "EqualPrincipal"){
   
   if(LoanType == "FixedRate"){
     
-    MortgageLoan = ShpitzerTable(Principal = Principal
+    MortgageLoan = EqualPrincipalTable(Principal = Principal
                                  ,Interest = (1 + NominalInterest) ^ (1/12) - 1
                                  ,Horizon = AnnualHorizon * 12)
   }
   
   if(LoanType %in% c("Prime","VarRate")){
     
-    MortgageLoan = VarShpitzerTable(Principal = Principal
+    MortgageLoan = VarEqualPrincipalTable(Principal = Principal
                                     ,Interest = (1 + InterestVector) ^ (1/12) - 1
                                     ,Horizon = AnnualHorizon * 12)
   }
@@ -337,7 +337,7 @@ if(Schedule == "EqualPrincipal"){
   if(LoanType == "RealFixedRate"){
     
     MortgageLoan = 
-      index.table(Table = ShpitzerTable(Principal = Principal
+      index.table(Table = EqualPrincipalTable(Principal = Principal
                                       ,Interest = (1 + RealInterest) ^ (1/12) - 1
                                       ,Horizon = AnnualHorizon * 12),
                   index.vec = IndexVector)
